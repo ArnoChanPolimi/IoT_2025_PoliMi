@@ -1,17 +1,37 @@
-# ESP32 NTP Clock
+# ESP32 Parking-Occupancy Sensor
 
-A simple clock that displays the time and date on an LCD1602 display. The time is synced via NTP.
+PlatformIO/Wokwi implementation of a low-power parking sensor using an ESP32, an HC-SR04 ultrasonic sensor, and ESP-NOW.
 
-Use [Wokwi](https://marketplace.visualstudio.com/items?itemName=wokwi.wokwi-vscode) to simulate this project.
+The firmware measures distance, classifies the space with a 50 cm threshold, broadcasts occupancy and distance to a sink, disables Wi-Fi after transmission, estimates state-level energy use, and enters timer-based deep sleep.
 
-## Building
+## Project Files
 
-This is a [PlatformIO](https://platformio.org) project. To build it, [install PlatformIO](https://docs.platformio.org/en/latest/core/installation/index.html), and then run the following command:
+- `src/IoT_challenge_01_CHEN_Hong.ino` — firmware and energy/timing instrumentation
+- `platformio.ini` — ESP32 Arduino build configuration
+- `diagram.json` — Wokwi circuit
+- `wokwi.toml` — Wokwi firmware/ELF paths
 
-```
+## Build
+
+Install PlatformIO, open this directory, and run:
+
+```bash
 pio run
 ```
 
-## Simulate the project
+## Simulate with Wokwi
 
-To simulate this project, install [Wokwi for VS Code](https://marketplace.visualstudio.com/items?itemName=wokwi.wokwi-vscode). Open the project directory in Visual Studio Code, press **F1** and select "Wokwi: Start Simulator".
+1. Install the Wokwi extension for VS Code.
+2. Build the project once so `.pio/build/esp32/firmware.elf` and `firmware.bin` exist.
+3. Open the Command Palette and run **Wokwi: Start Simulator**.
+
+## Hardware and Configuration Notes
+
+- HC-SR04 trigger pin: GPIO 5
+- HC-SR04 echo pin: GPIO 18
+- Occupied/free LEDs: GPIO 2 and GPIO 4
+- Occupancy threshold: 50 cm
+- Timer-based deep-sleep interval: 41 seconds
+- ESP-NOW broadcast address, power assumptions, and battery-energy assumptions are defined in the source.
+
+The power values and timing-derived energy calculations are coursework assumptions. Recalibrate them before using the firmware with physical hardware.
