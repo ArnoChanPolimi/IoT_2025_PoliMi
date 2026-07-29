@@ -1,0 +1,663 @@
+[
+  {
+    "id": "634f0248fe141e3c",
+    "type": "tab",
+    "label": "Flow 2",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "092f6c3203ce82e8",
+    "type": "inject",
+    "z": "634f0248fe141e3c",
+    "name": "",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 220,
+    "y": 140,
+    "wires": [
+      [
+        "74bd3f9cd3f91799"
+      ]
+    ]
+  },
+  {
+    "id": "74bd3f9cd3f91799",
+    "type": "function",
+    "z": "634f0248fe141e3c",
+    "name": "Generate ID",
+    "func": "var id = Math.floor(Math.random() * 30000);\nvar timestamp = Math.floor(Date.now() / 1000);\n\nvar message = {\n    id: id,\n    timestamp: timestamp\n};\n\n// 如果你不需要把数据转换为 JSON 字符串，可以直接使用对象\nmsg.payload = message;\nmsg.topic = \"challenge3/id_generator\";\n\n// 保存到 flow 上\nflow.set(\"last_id\", id);\nflow.set(\"last_ts\", timestamp);\n\nreturn msg;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 410,
+    "y": 140,
+    "wires": [
+      [
+        "19365bc0e0364831",
+        "0fd36c75021c6032",
+        "537b424227f64795"
+      ]
+    ]
+  },
+  {
+    "id": "147d2e41433dc024",
+    "type": "debug",
+    "z": "634f0248fe141e3c",
+    "name": "debug 2",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 920,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "19365bc0e0364831",
+    "type": "mqtt out",
+    "z": "634f0248fe141e3c",
+    "name": "Pub challenge3/id_generator",
+    "topic": "challenge3/id_generator",
+    "qos": "0",
+    "retain": "",
+    "respTopic": "",
+    "contentType": "",
+    "userProps": "",
+    "correl": "",
+    "expiry": "",
+    "broker": "5985f285e618d529",
+    "x": 660,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "0fd36c75021c6032",
+    "type": "function",
+    "z": "634f0248fe141e3c",
+    "name": "generate CSV",
+    "func": "let id = flow.get(\"last_id\");\nlet ts = flow.get(\"last_ts\");\nlet count = flow.get(\"log_count\") || 0;\ncount += 1;\nflow.set(\"log_count\", count);\nmsg.payload = `${count},${id},${ts}\\n`;\nnode.warn(\"Function Generate CSV, line payload: \" + msg.payload);\nreturn msg;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 620,
+    "y": 200,
+    "wires": [
+      [
+        "5377863307506e86"
+      ]
+    ]
+  },
+  {
+    "id": "5377863307506e86",
+    "type": "file",
+    "z": "634f0248fe141e3c",
+    "name": "write id_log.csv",
+    "filename": "/home/iotpolimi/IoT_CH03/id_log.csv",
+    "filenameType": "str",
+    "appendNewline": true,
+    "createDir": false,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 820,
+    "y": 200,
+    "wires": [
+      [
+        "147d2e41433dc024"
+      ]
+    ]
+  },
+  {
+    "id": "0be03354e70b7b37",
+    "type": "mqtt in",
+    "z": "634f0248fe141e3c",
+    "name": "Sub challenge3/id_generator",
+    "topic": "challenge3/id_generator",
+    "qos": "0",
+    "datatype": "auto-detect",
+    "broker": "e9f9e8546869c4cc",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 160,
+    "y": 420,
+    "wires": [
+      [
+        "eafd920bc816c8c0"
+      ]
+    ]
+  },
+  {
+    "id": "eafd920bc816c8c0",
+    "type": "function",
+    "z": "634f0248fe141e3c",
+    "name": "Generate N",
+    "func": "var id = msg.payload.id;\nmsg.sub_id = msg.payload.id;\nvar N = id % 7711;\nnode.warn(\"Computed N: \" + N);  // Log the value of N to the debug window\nmsg.N = N;\nreturn msg;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 330,
+    "y": 480,
+    "wires": [
+      [
+        "15bf083c29c52278"
+      ]
+    ]
+  },
+  {
+    "id": "15bf083c29c52278",
+    "type": "file in",
+    "z": "634f0248fe141e3c",
+    "name": "read Challenge3.csv",
+    "filename": "/home/iotpolimi/IoT_CH03/challenge3.csv",
+    "filenameType": "str",
+    "format": "utf8",
+    "chunk": false,
+    "sendError": false,
+    "encoding": "utf8",
+    "allProps": false,
+    "x": 480,
+    "y": 420,
+    "wires": [
+      [
+        "13a3c61deb39ab22"
+      ]
+    ]
+  },
+  {
+    "id": "69f01966b8f34f15",
+    "type": "function",
+    "z": "634f0248fe141e3c",
+    "name": "W3 function",
+    "func": "if (global.get(\"counter\") === undefined) {\n    global.set(\"counter\", 0);\n}\n\n\n//////\nvar N = msg.N;  // 第 N 行索引\nvar rows = msg.payload;\n\n// 检查是否越界\nif (N >= rows.length || !rows[N-1]) {\n    node.warn(\"Row \" + N + \" is out of bounds.\");\n    return null;\n}\n\nvar row = rows[N-1];\nvar info = row[\"Info\"];\nvar payload = row[\"Payload\"];\n\nnode.warn(\"N = \" + N);\nnode.warn(\"Info = : \" + info);\nnode.warn(\"Payload = : \" + payload);\n//////counter W6\nlet count = global.get(\"counter\") || 0;\ncount += 1;\nglobal.set(\"counter\", count);\nnode.warn(\"W3:Counter = \" + count);\nif (count > 80) {\n    node.warn(\"W3: Counter limit exceeded. Stopping further operations. Current value: \" + count);\n    return null;  // 停止这个消息的继续流动\n}\n///////\n\n// 判断是否包含 \"Publish Message\"\nif (!info || !info.includes(\"Publish Message\")) {\n    node.warn(\"Row \" + N + \" does not contain Publish Message.\");\n    return null;\n}\nnode.warn(\"Row \" + N + \" has contain Publish Message.\");\n\nvar messages = info.split(\",\");  // 按逗号分割多个 Publish Message\nvar results = [];\n\n// 拆分多个 JSON 对象：以 `},{` 为分界，但用 lookaround 保留完整结构\nvar payloads = payload.split(/(?<=\\})\\s*,\\s*(?=\\{)/);\nnode.warn(\"Payloads after split: \" + JSON.stringify(payloads));\n\nvar topicIndex = 0;\n\nmessages.forEach(function(message) {\n    var topicMatch = message.match(/\\[([^\\]]+)\\]/);  // 提取 [topic]\n    if (topicMatch) {\n        var topic = topicMatch[1];\n        var entry = {\n            timestamp: new Date().toISOString(),\n            id: N,\n            topic: topic,\n            payload: payloads[topicIndex] || null\n        };\n        node.warn(\"Matched topic: \" + topic + \" with payload: \" + entry.payload);\n        results.push(entry);\n        topicIndex++;\n    } else {\n        node.warn(\"No topic match found in message: \" + message);\n    }\n});\n\nresults.forEach(function(entry) {\n    var outMsg = {\n        topic: entry.topic,\n        payload: {\n            timestamp: entry.timestamp,\n            id: entry.id,\n            topic: entry.topic,\n            payload: entry.payload\n        }\n    };\n    node.warn(outMsg);\n    node.send(outMsg);\n});\nreturn null;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 510,
+    "y": 600,
+    "wires": [
+      [
+        "104e447d8a18654b",
+        "697ee0b47714e873",
+        "c70ace864fd37ea0",
+        "69b964e0f43ef4c4"
+      ]
+    ]
+  },
+  {
+    "id": "13a3c61deb39ab22",
+    "type": "csv",
+    "z": "634f0248fe141e3c",
+    "name": "",
+    "sep": ",",
+    "hdrin": true,
+    "hdrout": "none",
+    "multi": "mult",
+    "ret": "\\n",
+    "temp": "",
+    "skip": "0",
+    "strings": true,
+    "include_empty_strings": true,
+    "include_null_values": true,
+    "x": 690,
+    "y": 480,
+    "wires": [
+      [
+        "ef0fe00deab4870f",
+        "69f01966b8f34f15",
+        "a7275926620f9dad"
+      ]
+    ]
+  },
+  {
+    "id": "ef0fe00deab4870f",
+    "type": "debug",
+    "z": "634f0248fe141e3c",
+    "name": "debug 3",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 740,
+    "y": 400,
+    "wires": []
+  },
+  {
+    "id": "104e447d8a18654b",
+    "type": "debug",
+    "z": "634f0248fe141e3c",
+    "name": "debug 4",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 760,
+    "y": 600,
+    "wires": []
+  },
+  {
+    "id": "a84045831888c5a5",
+    "type": "mqtt out",
+    "z": "634f0248fe141e3c",
+    "name": "W3 MQTT OUT",
+    "topic": "msg.topic",
+    "qos": "0",
+    "retain": "",
+    "respTopic": "",
+    "contentType": "",
+    "userProps": "",
+    "correl": "",
+    "expiry": "",
+    "broker": "5985f285e618d529",
+    "x": 880,
+    "y": 800,
+    "wires": []
+  },
+  {
+    "id": "697ee0b47714e873",
+    "type": "function",
+    "z": "634f0248fe141e3c",
+    "name": "W4 function chart",
+    "func": "let count = global.get(\"counter\") || 0;\nnode.warn(\"W4 chart: Counter = \" + count);\nif (count > 80) {\n    node.warn(\"W4 chart: Counter limit exceeded. Stopping further operations. Current value: \" + count);\n    return null;  // 停止这个消息的继续流动\n}\n\nvar raw = msg.payload;\nnode.warn(\"RAW = \" + JSON.stringify(raw)); \n\nvar N = msg.payload.id;\nnode.warn(\"N(id) = \"+N);\n\n// 提取 payload 数据并检查是否是 temperature 类型\nvar payload = msg.payload.payload;\nnode.warn(\"Payload = \" + JSON.stringify(payload));\n\n\nif (typeof payload === \"string\") {\n    try {\n        payload = JSON.parse(payload);\n        node.warn(\"Parsed payload: \" + JSON.stringify(payload));\n    } catch (e) {\n        node.warn(\"JSON parse error: \" + e.message);\n        return null;\n    }\n}\n\nif (payload && payload.type === \"temperature\" && payload.unit === \"F\") {\n    var range = payload.range;\n    node.warn(\"Received valid Fahrenheit temperature with range: \" + JSON.stringify(range));\n\n    if (Array.isArray(range) && range.length === 2) {\n        var mean_value = (range[0] + range[1]) / 2;\n        node.warn(\"Calculated mean value: \" + mean_value);\n\n        msg.payload = mean_value;\n        msg.topic = \"Temperature\";\n        return msg;\n    }\n}\n\nreturn null;\n\n\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 510,
+    "y": 700,
+    "wires": [
+      [
+        "845243c7994ad4a1",
+        "56f3d0641178a6f1"
+      ]
+    ]
+  },
+  {
+    "id": "845243c7994ad4a1",
+    "type": "ui_chart",
+    "z": "634f0248fe141e3c",
+    "name": "Fahrenheit Temp Chart",
+    "group": "57545cfa81764af3",
+    "order": 0,
+    "width": "6",
+    "height": "5",
+    "label": "Temp",
+    "chartType": "line",
+    "legend": "false",
+    "xformat": "HH:mm:ss",
+    "interpolate": "linear",
+    "nodata": "",
+    "dot": false,
+    "ymin": "",
+    "ymax": "",
+    "removeOlder": 1,
+    "removeOlderPoints": "",
+    "removeOlderUnit": "3600",
+    "cutout": 0,
+    "useOneColor": false,
+    "useUTC": true,
+    "colors": [
+      "#1f77b4",
+      "#aec7e8",
+      "#ff7f0e",
+      "#2ca02c",
+      "#98df8a",
+      "#d62728",
+      "#ff9896",
+      "#9467bd",
+      "#c5b0d5"
+    ],
+    "outputs": 1,
+    "useDifferentColor": false,
+    "className": "",
+    "x": 620,
+    "y": 800,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "56f3d0641178a6f1",
+    "type": "debug",
+    "z": "634f0248fe141e3c",
+    "name": "debug 5",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 400,
+    "y": 800,
+    "wires": []
+  },
+  {
+    "id": "c70ace864fd37ea0",
+    "type": "function",
+    "z": "634f0248fe141e3c",
+    "name": "W4 Generate CSV",
+    "func": "let count = global.get(\"counter\") || 0;\nnode.warn(\"W4 Generate CSV: Counter = \" + count);\nif (count > 80) {\n    node.warn(\"W4: Counter limit exceeded. Stopping further operations. Current value: \" + count);\n    return null;  // 停止这个消息的继续流动\n}\n////////\n// === New: get and update row number for CSV ===\nif (global.get(\"rowNo\") === undefined) {\n    global.set(\"rowNo\", 1);\n}\n///\n\nvar raw = msg.payload;\nnode.warn(\"RAW = \" + JSON.stringify(raw)); \n\nvar N = msg.payload.id;\nvar payload = msg.payload.payload;\n\nif (typeof payload === \"string\") {\n    try {\n        payload = JSON.parse(payload);\n    } catch (e) {\n        return null;\n    }\n}\n\nif (typeof payload === \"string\") {\n    try {\n        payload = JSON.parse(payload);\n        node.warn(\"Parsed payload: \" + JSON.stringify(payload));\n    } catch (e) {\n        node.warn(\"JSON parse error: \" + e.message);\n        return null;\n    }\n}\n\nif (payload && payload.type === \"temperature\" && payload.unit === \"F\") {\n    var range = payload.range;\n\n    if (Array.isArray(range) && range.length === 2) {\n        var mean_value = (range[0] + range[1]) / 2;\n        let FrowNo = global.get(\"rowNo\") || 1;\n\n        var csvResult = {\n            No: FrowNo,\n            LONG: payload.long,\n            LAT: payload.lat,\n            MEAN_VALUE: mean_value,\n            TYPE: payload.type,\n            UNIT: payload.unit,\n            DESCRIPTION: payload.description\n        };\n        // Save new row number back to global\n        \n        FrowNo += 1;\n        global.set(\"rowNo\", FrowNo);\n\n        msg.payload = csvResult;\n        return msg;\n    }\n}\n\nreturn null;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 170,
+    "y": 680,
+    "wires": [
+      [
+        "7af922eee7652d97"
+      ]
+    ]
+  },
+  {
+    "id": "7af922eee7652d97",
+    "type": "file",
+    "z": "634f0248fe141e3c",
+    "name": "W4 write file",
+    "filename": "/home/iotpolimi/IoT_CH03/filtered_pubs.csv",
+    "filenameType": "str",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 170,
+    "y": 780,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "69b964e0f43ef4c4",
+    "type": "delay",
+    "z": "634f0248fe141e3c",
+    "name": "",
+    "pauseType": "rate",
+    "timeout": "5",
+    "timeoutUnits": "seconds",
+    "rate": "4",
+    "nbRateUnits": "1",
+    "rateUnits": "minute",
+    "randomFirst": "1",
+    "randomLast": "5",
+    "randomUnits": "seconds",
+    "drop": false,
+    "allowrate": true,
+    "outputs": 1,
+    "x": 850,
+    "y": 700,
+    "wires": [
+      [
+        "a84045831888c5a5",
+        "3879a5c7905c7c2b"
+      ]
+    ]
+  },
+  {
+    "id": "a7275926620f9dad",
+    "type": "function",
+    "z": "634f0248fe141e3c",
+    "name": "W5",
+    "func": "// 获取 CSV 中的所有行\nvar rows = msg.payload;          \n// 获取当前行号（N）\nvar N = msg.N;                   \n// 获取全局 ACK 计数器\nvar globalACKCounter = flow.get('globalACKCounter') || 0;  \n\n// 边界检查，确保当前行存在\nif (N > rows.length || !rows[N-1]) {\n    node.warn(\"Row \" + N + \" is out of bounds.\");\n    return null;\n}\n\nvar row = rows[N-1];             // 获取第 N 行的数据\nvar info = row[\"Info\"];          // 提取 Info 字段\n\nnode.warn(\"N = \" + N);\nnode.warn(\"Info = \" + info);\n\n//////counter W6\nlet count = global.get(\"counter\") || 0;\nglobal.set(\"counter\", count);\nnode.warn(\"W5:Counter = \" + count);\nif (count > 80) {\n    node.warn(\"W5: Counter limit exceeded. Stopping further operations. Current value: \" + count);\n    return null;  // 停止这个消息的继续流动\n}\n///////\n\n// 正则匹配 ACK 类型\nvar ackMatch = info.match(/(Connect Ack|Publish Ack|Subscribe Ack)/);\n\nif (ackMatch) {\n    var msgType = ackMatch[1];  // 获取 ACK 类型（Connect Ack, Publish Ack, Subscribe Ack）\n    node.warn(\"ackMatch = \" + ackMatch);\n    var subId = N;              // 假设 SUB_ID 为行号 N\n    globalACKCounter++;         // 增加 ACK 计数器\n\n    // 获取当前时间戳\n    var timestamp = new Date().toISOString();\n\n    // 构建 ACK 数据\n    var ackData = {\n        No: globalACKCounter,\n        TIMESTAMP: timestamp,\n        SUB_ID: subId,\n        MSG_TYPE: msgType\n    };\n\n    // 更新全局 ACK 计数器\n    flow.set('globalACKCounter', globalACKCounter);\n    node.warn(\"Ack Counter = \" + globalACKCounter);\n    node.warn(\"msg.payload (ackData) = \" + JSON.stringify(ackData));  // 输出 ackData\n\n    // 将 globalACKCounter 添加到 msg 对象中，便于 HTTP 请求使用\n    msg.globalACKCounter = globalACKCounter;\n    node.warn(\"msg.globalACKCounter = \"+msg.globalACKCounter);\n\n    // 构建 ThingSpeak 请求的 payload\n\n// 构造 HTTP 请求消息\n    var httpMsg = {\n        url: \"https://api.thingspeak.com/update?api_key=YOUR_THINGSPEAK_WRITE_API_KEY&field2=\" + globalACKCounter,\n        payload: \"\"\n    };\n\n    // 发送两个不同的消息，分别给不同模块\n    node.send([\n        httpMsg,               // 发送给 HTTP Request\n        { payload: ackData },  // 发送给 CSV\n    ]);\n\n    return null;  // return null，因为我们用的是 node.send()\n}\n\n// 如果不是 ACK 消息，返回 null\nreturn null;\n",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 890,
+    "y": 480,
+    "wires": [
+      [
+        "da45c2f0d14f42f9"
+      ],
+      [
+        "25ffccbc84eb2cee"
+      ]
+    ]
+  },
+  {
+    "id": "25ffccbc84eb2cee",
+    "type": "file",
+    "z": "634f0248fe141e3c",
+    "name": "Write ack_log.csv",
+    "filename": "/home/iotpolimi/IoT_CH03/ack_log.csv",
+    "filenameType": "str",
+    "appendNewline": true,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 1070,
+    "y": 540,
+    "wires": [
+      [
+        "77180e3bac48f28e"
+      ]
+    ]
+  },
+  {
+    "id": "77180e3bac48f28e",
+    "type": "debug",
+    "z": "634f0248fe141e3c",
+    "name": "debug 6",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1260,
+    "y": 540,
+    "wires": []
+  },
+  {
+    "id": "da45c2f0d14f42f9",
+    "type": "http request",
+    "z": "634f0248fe141e3c",
+    "name": "",
+    "method": "GET",
+    "ret": "txt",
+    "paytoqs": "ignore",
+    "url": "",
+    "tls": "d5c9cfc3291d03c9",
+    "persist": true,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": true,
+    "headers": [],
+    "x": 1050,
+    "y": 400,
+    "wires": [
+      [
+        "d6adc6266e29f16e"
+      ]
+    ]
+  },
+  {
+    "id": "d6adc6266e29f16e",
+    "type": "debug",
+    "z": "634f0248fe141e3c",
+    "name": "debug 7",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1220,
+    "y": 400,
+    "wires": []
+  },
+  {
+    "id": "3879a5c7905c7c2b",
+    "type": "debug",
+    "z": "634f0248fe141e3c",
+    "name": "debug 10",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1100,
+    "y": 760,
+    "wires": []
+  },
+  {
+    "id": "537b424227f64795",
+    "type": "debug",
+    "z": "634f0248fe141e3c",
+    "name": "debug 11",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 600,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "5985f285e618d529",
+    "type": "mqtt-broker",
+    "name": "MQTT Publish",
+    "broker": "localhost",
+    "port": "1884",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthRetain": "false",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closeRetain": "false",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willRetain": "false",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": ""
+  },
+  {
+    "id": "e9f9e8546869c4cc",
+    "type": "mqtt-broker",
+    "name": "Local Mosquitto Broker",
+    "broker": "localhost",
+    "port": "1884",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthRetain": "false",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closeRetain": "false",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willRetain": "false",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": ""
+  },
+  {
+    "id": "57545cfa81764af3",
+    "type": "ui_group",
+    "name": "Temperature Charts",
+    "tab": "5c04b4218e1f528a",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false,
+    "className": ""
+  },
+  {
+    "id": "d5c9cfc3291d03c9",
+    "type": "tls-config",
+    "name": "",
+    "cert": "",
+    "key": "",
+    "ca": "",
+    "certname": "",
+    "keyname": "",
+    "caname": "",
+    "servername": "",
+    "verifyservercert": false,
+    "alpnprotocol": ""
+  },
+  {
+    "id": "5c04b4218e1f528a",
+    "type": "ui_tab",
+    "name": "Temperature",
+    "icon": "dashboard",
+    "disabled": false,
+    "hidden": false
+  }
+]

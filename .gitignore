@@ -1,0 +1,69 @@
+# PlatformIO build outputs
+**/.pio/
+**/.pioenvs/
+**/.piolibdeps/
+*.bin
+*.elf
+*.map
+*.o
+*.a
+*.d
+*.dblite
+*.checksum
+
+# Editor and OS files
+**/.vscode/
+**/.idea/
+.DS_Store
+Thumbs.db
+
+# Python and Jupyter caches
+**/__pycache__/
+*.py[cod]
+**/.ipynb_checkpoints/
+**/.venv/
+**/venv/
+
+# Secrets and local configuration
+.env
+.env.*
+secrets.*
+credentials.*
+
+# Submission archives and duplicate bundles
+*.zip
+*.7z
+
+# Raw packet captures
+*.pcap
+*.pcapng
+
+# Course administration and grading
+/IoT Score Sheet.xlsx
+/challenge_1/Results_c1.pdf
+/challenge_2/ch2_results.pdf
+/challenge_3/ch3_results.pdf
+/Homework/results4.pdf
+
+# Instructor-provided assignments, slides, datasets, and references
+/challenge_1/Challenge1.pdf
+/challenge_2/Challenge2.pdf
+/challenge_2/Challenge 2 - IoT 2025.pdf
+/challenge_3/Challenge3.pdf
+/challenge_3/IoT_Challenge03_SubForm.pdf
+/challenge_3/challenge3.csv
+/challenge_3/lorasim_paper.pdf
+/challenge_3/LoRasim.ipynb
+/challenge_3/Sildes/
+/Homework/Homework.pdf
+
+# Duplicate/shared working folders
+/challenge_2/Shared_Folder/
+/challenge_3/shared_file/
+
+# Scratch presentations
+*.pptx
+
+# Original Node-RED export containing a historical hard-coded credential.
+# Use the sanitized flows.example.json instead.
+/challenge_3/submission/Part1_Challenge03/nodered.txt
